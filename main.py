@@ -22,8 +22,12 @@ class hockey_stick:
         strng = 'id: {}\nmake: {}\nhand: {}\ncurve: {}\nflex: {}\nprice: {}'.format(self.id, self.make, self.hand, self.curve, self.flex, self.price)
         return(strng)
 
+    # Administrator methods:
     # def add_stick(self):
     #     pass
+    # def remove_stick(self):
+    #     pass
+    def 
 
     # def get_details(self):
     #     pass
@@ -31,17 +35,16 @@ class hockey_stick:
     # def purchase_stick(self):
     #     pass
 
-    # Other things to do, first ask if they are a customer or manager
+    # Other things to do, first ask if they are a customer or administrator
     # 
-    # Manager can:
+    # Administrator can:
     #   - Add new stick to inventory
     #   - Remove stick from inventory
-    #   - View inventory (all details)
+    #   - View inventory
     #   - Change price
     #   - Quit
     #
     # Customer can:
-    #   - View inventory (not all details)
-    #   - View details of one stick
+    #   - View inventory
     #   - Purchase Stick
     #   - Quit

@@ -2,7 +2,6 @@ import datetime
 import pandas as pd
 import os
 # import csv
-currentDT = datetime.datetime.now()
 
 class hockey_stick:
 
@@ -36,6 +35,7 @@ class hockey_stick:
         curve = str(self.curve)
         flex = str(self.flex)
         price = str(self.price)
+        currentDT = datetime.datetime.now()
         newid = str(currentDT.month) + str(currentDT.day) + '-' + str(currentDT.hour) + str(currentDT.minute)
                     # create new dictionary
                     # dict1 = {'id' : newid , 'make' : self.make , 'hand' : self.hand,
@@ -143,7 +143,7 @@ def init_menu():
 def administrator():
     answer = 0
     menu = '''
-            --- Admin Console ---
+            -------- Admin Console --------
             
             What would you like to do?
             (1) View Current Inventory
@@ -180,7 +180,7 @@ def admin_add_a_stick():
     new_stick = hockey_stick(False, make, hand, curve, flex, price)
     new_stick.add_stick()
     print('\nStick has been added!')
-    administrator()
+    view_inventory('admin')
 
 def view_inventory(who):
     df = pd.read_csv('database.csv')
@@ -220,7 +220,7 @@ def customer():
         view_inventory('customer')
     elif answer == 2:
         stick_id = 0
-        stick_id = str(input('Enter the ID of the stick you\'d like to purchase: '))
+        stick_id = str(input('Enter the stick ID: '))
         purchase_stick(stick_id)
     elif answer == 3:
         pass # exit the program
@@ -234,10 +234,11 @@ def remove_stick(stick_id):
             stick_found = True
             hockey_stick.remove_stick(stick_id, row)
             print('Entry removed.')
+            view_inventory('admin')
             break
     if stick_found == False:
         print('Stick ID not found in inventory.')
-    administrator()
+        administrator()
 
 def edit_stick(stick_id):
     # check if ID is in the inventory
@@ -249,16 +250,26 @@ def edit_stick(stick_id):
             new_price = str(input('Enter the new price: '))
             hockey_stick.modify_price(stick_id, row, new_price)
             print('Price updated!')
+            view_inventory('admin')
             break
     if stick_found == False:
         print('Stick ID not found in inventory.')
-    administrator()
+        administrator()
 
 def purchase_stick(stick_id):
-    print(stick_id)
-    pass
-
-
+    # check if id is in list
+    stick_found = False
+    df = pd.read_csv('database.csv')
+    for row in range(len(df.index)):
+        if stick_id == df.iat[row,0]:
+            stick_found = True
+            hockey_stick.remove_stick(stick_id, row)
+            print('Thank you for your purchase!\nYou will receive your stick in the mail soon!')
+            view_inventory('customer')
+            break
+    if stick_found == False:
+        print('Stick ID not found in inventory.')
+        customer()
 
 init_menu()
 

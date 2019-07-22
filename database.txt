@@ -1,3 +1,0 @@
-{'id': '721-23', 'make': 'new', 'hand': 'right', 'curve': 'curvy', 'flex': 5, 'price': 700.0}
-{'id': '721-24', 'make': 'brand new', 'hand': 'right', 'curve': 'swiss', 'flex': 70, 'price': 100.0}
-{'id': '721-27', 'make': 'Bauer', 'hand': 'Right', 'curve': 'Sakic', 'flex': 100, 'price': 150.0}

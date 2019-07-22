@@ -1,5 +1,7 @@
 import datetime
 import pandas as pd
+import os
+# import csv
 currentDT = datetime.datetime.now()
 
 class hockey_stick:
@@ -45,8 +47,33 @@ class hockey_stick:
         with open('database.csv', mode='a+') as f:
             f.write(insert_string)
 
-    # def remove_stick(self):
-    #     pass
+    def remove_stick(stick_id=False, row_number=False):
+        # with open('database.csv', mode='w') as f:
+        print(str(stick_id) + ' ' + str(row_number))
+        df = pd.read_csv('database.csv')
+        cols = df.columns
+        # create the column title string
+        col_list = ''
+        for n in range(6):
+            if n == 5:
+                col_list += cols[n]
+            else:
+                col_list += cols[n] + ','
+        # create the items string
+        insert_string = ''
+        for row in range(len(df.index)):    
+            if row != row_number:
+                for c in range(6):
+                    insert_string += str(df.iat[row,c])
+                    if c != 5:
+                        insert_string += ','
+                    else:
+                        insert_string += '\n'
+        with open('database_temp.csv', mode='a+') as f: # write the strings to the temp file
+            f.write(col_list + '\n' + insert_string)
+        os.remove('database.csv') # remove the current database file
+        os.rename('database_temp.csv', 'database.csv') # rename the temp file to the new database name
+            
     # def modify_price(self):
     #     pass
 
@@ -85,11 +112,9 @@ def init_menu():
     answer = int(input(menu))
     while (answer != 1) and (answer != 2) and (answer != 3):
         answer = int(input('Input not accepted. Please enter 1, 2, or 3: '))
-    if answer == 1:
-        pass # call the customer function
-
-    elif answer == 2:
-        pass # call the administrator function
+    if answer == 1: # I'm a customer
+        customer()
+    elif answer == 2: # I'm an administrator
         administrator()
     elif answer == 3:
         pass # exit the program
@@ -110,16 +135,18 @@ def administrator():
     answer = int(input(menu))
     while (answer != 1) and (answer != 2) and (answer != 3) and (answer != 4) and (answer != 5):
         answer = int(input('Input not accepted. Please enter 1, 2, 3, 4, or 5: '))
-    if answer == 1:
-        view_inventory()
-    elif answer == 2:
+    if answer == 1: # admin - view inventory
+        view_inventory('admin')
+    elif answer == 2: # admin - add a stick
         admin_add_a_stick()
-    elif answer == 3:
-        print('Remove Stick')
-    elif answer == 4:
+    elif answer == 3: # admin - remove a stick
+        stick_id = 0
+        stick_id = input(str('Enter the ID of the stick you\'d like to remove: '))
+        remove_stick(stick_id)
+    elif answer == 4: # admin - edit the price
         print('Edit Price')
-    elif answer == 5:
-        pass # exit the program
+    elif answer == 5: # exit the program
+        pass
 
 def admin_add_a_stick():
     make = str(input('Adding a stick. Enter the following details:\n\nWhat brand is it? '))
@@ -132,12 +159,8 @@ def admin_add_a_stick():
     print('\nStick has been added!')
     administrator()
 
-def view_inventory():
+def view_inventory(who):
     df = pd.read_csv('database.csv')
-    # df
-    # print(df.dtypes)
-    # print(df.head)
-    # print(df.dtypes)
     cols = df.columns
     print('\n'+cols[0]+'          '+cols[1]+'       '+cols[2]+'        '+cols[3]+'       '+cols[4]+'        '+cols[5])
     print('-----------------------------------------------------------------------')
@@ -153,11 +176,61 @@ def view_inventory():
                 this_many_spaces += ' '
             print(current_item, end=this_many_spaces)
         print('\n')
-        
-    # print(len(cols))
-    # print(df.iat[0,1])
-    # print(df[cols[0]][0])
-    administrator()
+    if who == 'admin':
+        administrator()
+    else:
+        customer()
     
+def customer():
+    answer = 0
+    menu = '''
+            Make a selection:
+            (1) View Current Inventory
+            (2) Purchase a Stick
+            (3) Done
+
+            '''
+    answer = int(input(menu))
+    while (answer != 1) and (answer != 2) and (answer != 3):
+        answer = int(input('Input not accepted. Please enter 1, 2, or 3: '))
+    if answer == 1:
+        view_inventory('customer')
+    elif answer == 2:
+        stick_id = 0
+        stick_id = str(input('Enter the ID of the stick you\'d like to purchase: '))
+        purchase_stick(stick_id)
+    elif answer == 3:
+        pass # exit the program
+
+def remove_stick(stick_id):
+    # check if id is in list
+    stick_found = False
+    df = pd.read_csv('database.csv')
+    for row in range(len(df.index)):
+        if stick_id == df.iat[row,0]:
+            stick_found = True
+            print('Stick found. Remove the Row from the file.')
+            hockey_stick.remove_stick(stick_id, row)
+            break
+    if stick_found == False:
+        print('Stick ID not found in inventory.')
+    administrator()
+
+def purchase_stick(stick_id):
+    print(stick_id)
+    pass
+
+
 
 init_menu()
+
+# troubleshooting commands:
+#
+# df
+# print(df.dtypes)
+# print(df.head)
+# print(df.dtypes)
+#
+# print(len(cols))
+# print(df.iat[0,1])
+# print(df[cols[0]][0])

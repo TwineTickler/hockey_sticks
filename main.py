@@ -48,8 +48,6 @@ class hockey_stick:
             f.write(insert_string)
 
     def remove_stick(stick_id=False, row_number=False):
-        # with open('database.csv', mode='w') as f:
-        print(str(stick_id) + ' ' + str(row_number))
         df = pd.read_csv('database.csv')
         cols = df.columns
         # create the column title string
@@ -74,15 +72,38 @@ class hockey_stick:
         os.remove('database.csv') # remove the current database file
         os.rename('database_temp.csv', 'database.csv') # rename the temp file to the new database name
             
-    # def modify_price(self):
-    #     pass
+    def modify_price(stick_id=False, row_number=False, new_price=False):
+        df = pd.read_csv('database.csv')
+        cols = df.columns
+        # create the column title string
+        col_list = ''
+        for n in range(6):
+            if n == 5:
+                col_list += cols[n]
+            else:
+                col_list += cols[n] + ','
+        # create the items string
+        insert_string = ''
+        for row in range(len(df.index)):    
+            for c in range(6):
+                if row == row_number:
+                    if c == 5:
+                        insert_string += str(new_price)
+                    else:
+                        insert_string += str(df.iat[row,c])
+                else:
+                    insert_string += str(df.iat[row,c])
+                if c != 5:
+                    insert_string += ','
+                else:
+                    insert_string += '\n'
+        with open('database_temp.csv', mode='a+') as f: # write the strings to the temp file
+            f.write(col_list + '\n' + insert_string)
+        os.remove('database.csv') # remove the current database file
+        os.rename('database_temp.csv', 'database.csv') # rename the temp file to the new database name
 
     # Customer methods:
     # def purchase_stick(self):
-    #     pass
-
-    # Shared methods:
-    # def view_inventory(self):
     #     pass
 
 # Other things to do, first ask if they are a customer or administrator
@@ -141,10 +162,12 @@ def administrator():
         admin_add_a_stick()
     elif answer == 3: # admin - remove a stick
         stick_id = 0
-        stick_id = input(str('Enter the ID of the stick you\'d like to remove: '))
+        stick_id = input(str('Enter the stick ID: '))
         remove_stick(stick_id)
     elif answer == 4: # admin - edit the price
-        print('Edit Price')
+        stick_id = 0
+        stick_id = input(str('Enter the stick ID: '))
+        edit_stick(stick_id)
     elif answer == 5: # exit the program
         pass
 
@@ -209,8 +232,23 @@ def remove_stick(stick_id):
     for row in range(len(df.index)):
         if stick_id == df.iat[row,0]:
             stick_found = True
-            print('Stick found. Remove the Row from the file.')
             hockey_stick.remove_stick(stick_id, row)
+            print('Entry removed.')
+            break
+    if stick_found == False:
+        print('Stick ID not found in inventory.')
+    administrator()
+
+def edit_stick(stick_id):
+    # check if ID is in the inventory
+    stick_found = False
+    df = pd.read_csv('database.csv')
+    for row in range(len(df.index)):
+        if stick_id == df.iat[row,0]:
+            stick_found = True
+            new_price = str(input('Enter the new price: '))
+            hockey_stick.modify_price(stick_id, row, new_price)
+            print('Price updated!')
             break
     if stick_found == False:
         print('Stick ID not found in inventory.')
